@@ -1,11 +1,30 @@
 from flask import Flask
 from flask import jsonify
+from flask import Blueprint
 from flask_sqlalchemy import SQLAlchemy
 
 
-app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite://'
-db = SQLAlchemy(app)
+db = SQLAlchemy()
+
+# Blueprints define the routes the routes of the app, without creating one
+    # this way you can separate app creation and bind blueprints to many apps!
+    # there's a register blueprints method on the app object
+bp = Blueprint("vim_labs", __name__)
+
+
+def create_app(config=None):
+    """
+    Returns a Flask app bound to the sqlalchemy db
+
+    Args:
+        config (dict): override Flask app configs
+    """
+    app = Flask(__name__)
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite://'
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    app.config.update(config or {})
+    db.init_app(app)
+    return app
 
 
 class User(db.Model):
@@ -20,20 +39,23 @@ class User(db.Model):
     def __repr__(self):
         return '<User %r>' % self.username
 
-@app.route('/')
+
+@bp.route('/')
 def hello_world():
     return 'Hello, World!'
 
 
-@app.route('/add_user')
+@bp.route('/add_user')
 def add_user():
+    """Adds guest user to db"""
     guest = User('guest', 'guest@example.com')
     db.session.add(guest)
     db.session.commit()
     return 'added guest'
 
-@app.route('/print_users')
+@bp.route('/print_users')
 def print_users():
+    """Returns json of all users in db"""
     users = User.query.all()
     users_dict = {}
     for user in users:
@@ -41,5 +63,7 @@ def print_users():
     return jsonify(users_dict)
 
 if __name__ == "__main__":
-    db.create_all()
+    app = create_app()
+    app.register_blueprint(bp)
+    db.create_all(app=app)
     app.run()
