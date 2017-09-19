@@ -1,0 +1,2 @@
+def ferment():
+    return "fermented"
