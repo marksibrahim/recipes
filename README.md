@@ -11,6 +11,9 @@ A flask skeleton with the app factory pattern and route blueprints for clean int
 ## [Flask Kafka Streaming](https://github.com/marksibrahim/recipes/tree/master/flask-kafka-streaming) (via Sockets)
 A flask app for streaming from Kafka via web sockets using socketio.
 
+## [Modern Pandas](https://github.com/marksibrahim/recipes/tree/master/modern-pandas)
+Pandas recipes and best practices
+
 ## [Open a New Chrome Window on Mac](https://github.com/marksibrahim/recipes/tree/master/mac-new-chrome-window)
 An AppleScript to open a new chrome window in the current desktop. 
 
