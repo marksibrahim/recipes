@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request
 from routes import bp
-from models import Recipe, db
+from my_app.models import Recipe, db
 
 
 def create_app(config=None):

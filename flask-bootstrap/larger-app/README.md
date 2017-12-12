@@ -1,21 +1,23 @@
 # Start a New Project
 1. define models in `models.py`
-2. expose routes in `routes.py`
-3. add integration tests in `application.py`
+2. define app logic in `controllers.py`
+3. expose routes in `routes.py`
+4. add integration tests in `test_application.py`
 
 # Structure 
 Aims to isolate concerns into models and views. The structure uses [blueprints](http://flask.pocoo.org/docs/0.12/blueprints/#blueprints) and the [app factory pattern](http://flask.pocoo.org/docs/0.12/patterns/appfactories/).
 
-Inspired by
-* [pattern in Flask docs](http://flask.pocoo.org/docs/0.12/patterns/packages/)
+Inspired by [pattern in Flask docs](http://flask.pocoo.org/docs/0.12/patterns/packages/).
 
 | | |
 | ------------- | ------------- |
+| `my_app/models.py` | defines SQLAlchemy models |
+| `my_app/controller.py` | defines app logic |
+| `test_application.py` | integration tests using pytest fixtures |
 | `config.py` | contains configs for each environment |
-| `application.py` | defines app factory and Flask app instance |
 | `routes.py` | defines routes using blueprints |
 | `manage.py` | handles database migrations such as a new column |
-| `test_application.py` | integration tests using pytest fixtures |
+| `application.py` | defines app factory and Flask app instance |
 
 
 | | |
