@@ -14,7 +14,7 @@ Inspired by [pattern in Flask docs](http://flask.pocoo.org/docs/0.12/patterns/pa
 | `my_app/models.py` | defines SQLAlchemy models |
 | `my_app/controller.py` | defines app logic |
 | `test_application.py` | integration tests using pytest fixtures |
-| `config.py` | contains configs for each environment |
+| `configs.py` | contains configs for each environment |
 | `routes.py` | defines routes using blueprints |
 | `manage.py` | handles database migrations such as a new column |
 | `application.py` | defines app factory and Flask app instance |

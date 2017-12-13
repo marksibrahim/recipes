@@ -5,4 +5,10 @@ Keep most code in a single `app.py` file.
 
 
 # Large App: Package
-Separate models/forms from routes/configuration following model-view-controller.
+Aims to isolate concerns into models, controllers for app logic, and routes for views. 
+
+Incorporates
+* Flask Blueprints for views
+* Flask-SQLAlchemy
+* Flask-Migrate (Alembic)
+

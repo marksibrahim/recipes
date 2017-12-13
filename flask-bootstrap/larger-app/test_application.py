@@ -8,7 +8,7 @@ def app(request):
     Returns a Flask app for testing
     Following https://github.com/pallets/flask/blob/master/examples/flaskr/tests/test_flaskr.py
     """
-    app = create_app({})
+    app = create_app("development")
 
     with app.app_context():
         db.init_app(app)

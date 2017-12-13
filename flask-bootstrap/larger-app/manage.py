@@ -9,7 +9,7 @@ from flask_script import Manager
 from application import db, create_app
 
 # initialize app
-app = create_app()
+app = create_app("production")
 
 migrate = Migrate(app, db)
 

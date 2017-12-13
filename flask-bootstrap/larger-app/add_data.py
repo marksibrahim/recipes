@@ -5,7 +5,7 @@ An example of using SQLAlchemy outside the Flask app
 from application import db, create_app, Recipe
 
 
-app = create_app()
+app = create_app("production")
 
 if __name__ == "__main__":
     # http://flask-sqlalchemy.pocoo.org/2.3/contexts/
