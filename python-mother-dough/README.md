@@ -36,8 +36,12 @@ Good principles to keep in mind
 
 
 ### Automatic Style Checks
-* [pycodestyle](https://github.com/PyCQA/pycodestyle): enforces PEP8, without being too picky.
-* [pylint](https://www.pylint.org/): covers much more than PEP8, but is absurdly picky out-of-the-box (not always with good reason).
+* [PyCodestyle](https://github.com/PyCQA/pycodestyle): enforces PEP8, without being too picky.
+* [PyLint](https://www.pylint.org/): covers much more than PEP8, but is absurdly picky out-of-the-box (not always with good reason).
+
+* [PyFlakes](https://pypi.python.org/pypi/pyflakes): checks correctness without complaining about style or importing the code. 
+
+Go with [Flake8](https://pypi.python.org/pypi/flake8), which runs both pycodestyle and pyflakes.
 
 ### Conventions
 *How should I name directories and packages?*
