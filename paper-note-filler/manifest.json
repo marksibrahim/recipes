@@ -1,0 +1,9 @@
+{
+	"id": "file-arxiv-article",
+	"name": "File Arxiv Article",
+	"version": "1.0.1",
+	"minAppVersion": "0.15.0",
+	"description": "Download and parse info about ArXiv article",
+	"author": "Mark",
+	"isDesktopOnly": true
+}
