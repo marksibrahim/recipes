@@ -1,0 +1,35 @@
+{
+	"name": "paper-note-filler",
+	"version": "1.0.0",
+	"description": "Take an arxiv.org URL and automatically create an Obsidian note from it.",
+	"main": "main.js",
+	"scripts": {
+		"dev": "node esbuild.config.mjs",
+		"build": "tsc -noEmit -skipLibCheck && node esbuild.config.mjs production",
+		"version": "node version-bump.mjs && git add manifest.json versions.json"
+	},
+	"keywords": [],
+	"author": "Claudia Hauff",
+	"license": "MIT",
+	"devDependencies": {
+		"@types/node": "^16.11.6",
+		"@typescript-eslint/eslint-plugin": "5.29.0",
+		"@typescript-eslint/parser": "5.29.0",
+		"builtin-modules": "3.3.0",
+		"esbuild": "0.14.47",
+		"obsidian": "latest",
+		"tslib": "2.4.0",
+		"typescript": "4.7.4"
+	},
+	"dependencies": {
+		"arxiv-api": "^1.1.1",
+		"dom-parser": "^1.1.5",
+		"download": "^8.0.0",
+		"fs": "^0.0.1-security",
+		"js-file-download": "^0.4.12",
+		"path": "^0.12.7",
+		"request": "^2.88.2",
+		"ts-node": "^10.9.2",
+		"xmldom": "^0.6.0"
+	}
+}
