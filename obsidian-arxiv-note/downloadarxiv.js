@@ -11,7 +11,8 @@ const ID_REGEXP_REPLACE = [
 var DOMParser = require('xmldom').DOMParser;
 const LOG_PREFIX = "[arXiv-utils]";
 const path = require("path");
-const download = require('download');
+const fs = require('fs')
+var download = require('download-file')
 
 
 // // Return the id parsed from the url.
@@ -90,21 +91,23 @@ export async function getArxivInfoAsync(url, downloadFolder = "/Users/markibrahi
 
 	// download pdf
 	const downloadUrl = "https://arxiv.org/pdf/" + id + ".pdf";
-	const downloadPath = path.join(downloadFolder, articleInfo.escapedTitle + " - " + articleInfo.publishedYear + ".pdf");
-	download(downloadUrl, downloadPath)
-		.then(() => {
+	const filename = articleInfo.escapedTitle + " - " + articleInfo.publishedYear + ".pdf";
+	const downloadPath = path.join(downloadFolder, filename);
+
+	var options = {
+		directory: downloadFolder,
+		filename: filename
+	}
+
+	if (fs.existsSync(downloadPath)) {
+		console.log("file already exists, skipping download.")
+	}
+	else {
+		download(downloadUrl, options, function (err) {
+			if (err) throw err
 			console.log("successfully downloaded article to " + downloadPath);
 		})
-		.catch(error => {
-			if (error.code === 'EEXIST') {
-				console.log("pdf found, skipping download.");
-			}
-			else {
-				console.error("failed to download pdf");
-				console.error(error);
-			}
-		}
-		)
+	}
 
 	return [articleInfo.escapedTitle, articleInfo.authors, articleInfo.publishedYear];
 
