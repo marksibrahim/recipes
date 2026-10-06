@@ -1,0 +1,748 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>V60 Brew Guide</title>
+<meta name="description" content="A guided Hario V60 brewing timer built around James Hoffmann's V60 recipes.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f5efe6;
+    --bg-2: #ede4d6;
+    --card: #fffaf3;
+    --ink: #2b1f18;
+    --ink-2: #6b5a4e;
+    --ink-3: #a39282;
+    --line: #e2d6c5;
+    --accent: #b4572e;
+    --accent-soft: #f3dccd;
+    --water: #8fb3c4;
+    --coffee: #5a3524;
+    --coffee-light: #8a5a3c;
+    --swirl: #c99a3f;
+    --wait: #d9cbb8;
+    --glass: rgba(43, 31, 24, 0.18);
+    --shadow: 0 1px 2px rgba(60, 40, 20, .06), 0 12px 32px -12px rgba(60, 40, 20, .18);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #15100d; --bg-2: #1c1511; --card: #211913; --ink: #f2e7da; --ink-2: #bfae9c; --ink-3: #7d6c5d;
+      --line: #33281f; --accent: #e3895a; --accent-soft: #3a2519; --water: #6f97aa; --coffee: #b07a52;
+      --coffee-light: #8a5a3c; --swirl: #d9ae55; --wait: #3a2e25; --glass: rgba(242, 231, 218, 0.2);
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 16px 40px -16px rgba(0,0,0,.6);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #15100d; --bg-2: #1c1511; --card: #211913; --ink: #f2e7da; --ink-2: #bfae9c; --ink-3: #7d6c5d;
+    --line: #33281f; --accent: #e3895a; --accent-soft: #3a2519; --water: #6f97aa; --coffee: #b07a52;
+    --coffee-light: #8a5a3c; --swirl: #d9ae55; --wait: #3a2e25; --glass: rgba(242, 231, 218, 0.2);
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 16px 40px -16px rgba(0,0,0,.6);
+  }
+
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font: 15px/1.55 Inter, system-ui, -apple-system, sans-serif;
+    background-image: radial-gradient(1200px 600px at 85% -10%, var(--accent-soft), transparent 60%);
+    background-attachment: fixed;
+    min-height: 100vh;
+  }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 32px 16px 64px; }
+  h1, h2, h3, .serif { font-family: Fraunces, Georgia, serif; font-weight: 400; letter-spacing: -0.01em; }
+  button { font: inherit; color: inherit; cursor: pointer; }
+  button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  /* header */
+  header { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; margin-bottom: 32px; flex-wrap: wrap; }
+  .eyebrow { text-transform: uppercase; letter-spacing: .18em; font-size: 11px; color: var(--ink-3); font-weight: 600; }
+  h1 { font-size: clamp(44px, 7vw, 76px); line-height: .95; margin: 6px 0 0; font-weight: 300; }
+  h1 em { color: var(--accent); font-style: italic; }
+  .header-tools { display: flex; gap: 8px; }
+  .icon-btn {
+    border: 1px solid var(--line); background: var(--card); border-radius: 999px;
+    height: 38px; padding: 0 14px; display: inline-flex; align-items: center; gap: 8px; font-size: 13px; color: var(--ink-2);
+  }
+  .icon-btn[aria-pressed="true"] { color: var(--ink); border-color: var(--ink-3); }
+  .icon-btn svg { width: 16px; height: 16px; }
+
+  .grid { display: grid; grid-template-columns: 380px 1fr; gap: 24px; align-items: start; }
+  @media (max-width: 920px) { .grid { grid-template-columns: 1fr; } }
+
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 20px; box-shadow: var(--shadow); }
+  .pad { padding: 22px; }
+  .section-title { font-size: 12px; text-transform: uppercase; letter-spacing: .14em; color: var(--ink-3); font-weight: 600; margin: 0 0 12px; }
+
+  /* recipes */
+  .recipes { display: grid; gap: 10px; }
+  .recipe {
+    text-align: left; border: 1px solid var(--line); background: transparent; border-radius: 14px;
+    padding: 14px 16px; transition: border-color .2s, background .2s, transform .2s;
+  }
+  .recipe:hover { border-color: var(--ink-3); }
+  .recipe[aria-checked="true"] { border-color: var(--accent); background: var(--accent-soft); }
+  .recipe .name { font-family: Fraunces, serif; font-size: 20px; display: flex; justify-content: space-between; align-items: baseline; }
+  .recipe .meta { color: var(--ink-2); font-size: 13px; margin-top: 2px; }
+  .recipe .time { font-family: Inter; font-size: 12px; color: var(--ink-3); font-variant-numeric: tabular-nums; }
+
+  /* dose */
+  .dose { margin-top: 22px; }
+  .dose-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; text-align: center; }
+  .stat { background: var(--bg-2); border-radius: 12px; padding: 12px 6px; }
+  .stat .v { font-family: Fraunces, serif; font-size: 26px; line-height: 1.1; font-variant-numeric: tabular-nums; }
+  .stat .v small { font-size: 14px; color: var(--ink-2); }
+  .stat .l { font-size: 11px; color: var(--ink-3); text-transform: uppercase; letter-spacing: .1em; margin-top: 2px; }
+  .slider-row { display: flex; align-items: center; gap: 10px; margin-top: 14px; }
+  .step-btn { width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--line); background: var(--card); font-size: 18px; line-height: 1; flex: none; }
+  input[type=range] { -webkit-appearance: none; appearance: none; width: 100%; height: 4px; border-radius: 4px; background: var(--line); }
+  input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 20px; height: 20px; border-radius: 50%; background: var(--accent); border: 3px solid var(--card); box-shadow: 0 0 0 1px var(--accent); cursor: grab; }
+  input[type=range]::-moz-range-thumb { width: 16px; height: 16px; border-radius: 50%; background: var(--accent); border: 3px solid var(--card); box-shadow: 0 0 0 1px var(--accent); cursor: grab; }
+
+  /* prep */
+  .prep { margin-top: 22px; }
+  .prep ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+  .prep label { display: flex; gap: 12px; align-items: flex-start; padding: 8px 4px; border-radius: 10px; cursor: pointer; }
+  .prep label:hover { background: var(--bg-2); }
+  .prep input { position: absolute; opacity: 0; pointer-events: none; }
+  .check { flex: none; width: 20px; height: 20px; border-radius: 6px; border: 1.5px solid var(--ink-3); margin-top: 1px; display: grid; place-items: center; transition: all .2s; }
+  .check svg { width: 12px; height: 12px; opacity: 0; transform: scale(.5); transition: all .2s; stroke: var(--card); }
+  .prep input:checked + .check { background: var(--accent); border-color: var(--accent); }
+  .prep input:checked + .check svg { opacity: 1; transform: none; }
+  .prep input:checked ~ .txt { color: var(--ink-3); text-decoration: line-through; text-decoration-color: var(--ink-3); }
+  .prep input:focus-visible + .check { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .txt b { font-weight: 600; }
+  .txt small { display: block; color: var(--ink-3); font-size: 12px; }
+
+  /* brew stage */
+  .stage { padding: 28px; position: relative; overflow: hidden; }
+  .stage-top { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+  .stage-top h2 { font-size: 30px; margin: 0; }
+  .stage-top .sub { color: var(--ink-2); font-size: 14px; }
+  .stage-body { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: center; margin-top: 18px; }
+  @media (max-width: 640px) { .stage-body { grid-template-columns: 1fr; } .stage { padding: 20px; } }
+
+  .dial { position: relative; width: 100%; max-width: 340px; margin: 0 auto; aspect-ratio: 1; }
+  .dial svg { width: 100%; height: 100%; display: block; }
+  .dial-center { position: absolute; inset: 0; display: grid; place-content: center; text-align: center; pointer-events: none; }
+  .clock { font-family: Fraunces, serif; font-size: clamp(52px, 9vw, 72px); font-weight: 300; line-height: 1; font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
+  .clock-sub { color: var(--ink-3); font-size: 12px; margin-top: 8px; letter-spacing: .08em; text-transform: uppercase; font-variant-numeric: tabular-nums; }
+  .scale-read { margin-top: 14px; display: inline-flex; align-items: baseline; gap: 6px; justify-content: center; }
+  .scale-read .w { font-family: Fraunces, serif; font-size: 28px; color: var(--accent); font-variant-numeric: tabular-nums; }
+  .scale-read .u { color: var(--ink-2); font-size: 13px; }
+
+  .seg { fill: none; stroke-width: 10; stroke-linecap: butt; transition: opacity .3s; }
+  .seg.past { opacity: .35; }
+  .progress-dot { fill: var(--ink); stroke: var(--card); stroke-width: 4; transition: none; }
+
+  /* illustration */
+  .brewer { width: 100%; max-width: 240px; margin: 0 auto; display: block; }
+  .stream { stroke: var(--water); stroke-width: 3; stroke-linecap: round; stroke-dasharray: 6 5; animation: flow .4s linear infinite; opacity: 0; transition: opacity .3s; }
+  .stream.on { opacity: .9; }
+  @keyframes flow { to { stroke-dashoffset: -11; } }
+  .drip { fill: var(--coffee); opacity: 0; }
+  .drip.on { animation: drip 0.9s ease-in infinite; }
+  @keyframes drip { 0% { transform: translateY(0); opacity: 0; } 15% { opacity: 1; } 100% { transform: translateY(var(--drop, 40px)); opacity: 0; } }
+  .swirl-ring { fill: none; stroke: var(--swirl); stroke-width: 2; stroke-dasharray: 4 6; opacity: 0; transform-origin: 100px 70px; }
+  .swirl-ring.on { opacity: .9; animation: spin 1.6s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .steam path { fill: none; stroke: var(--ink-3); stroke-width: 1.5; stroke-linecap: round; opacity: 0; }
+  .steam.on path { animation: steam 3s ease-in-out infinite; }
+  .steam.on path:nth-child(2) { animation-delay: 1s; }
+  .steam.on path:nth-child(3) { animation-delay: 2s; }
+  @keyframes steam { 0% { opacity: 0; transform: translateY(6px); } 40% { opacity: .6; } 100% { opacity: 0; transform: translateY(-14px); } }
+
+  /* now / next */
+  .now { margin-top: 22px; display: grid; grid-template-columns: 1fr auto; gap: 16px; align-items: center; padding: 18px 20px; border-radius: 16px; background: var(--bg-2); position: relative; overflow: hidden; }
+  .now::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: var(--p, 0%); background: var(--accent-soft); transition: width .25s linear; z-index: 0; }
+  .now > * { position: relative; z-index: 1; }
+  .now .tag { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; text-transform: uppercase; letter-spacing: .14em; font-weight: 600; color: var(--accent); }
+  .now .tag i { width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+  .now h3 { font-size: 26px; margin: 4px 0 2px; line-height: 1.15; }
+  .now p { margin: 0; color: var(--ink-2); font-size: 14px; }
+  .now .count { text-align: right; }
+  .now .count .n { font-family: Fraunces, serif; font-size: 36px; font-variant-numeric: tabular-nums; line-height: 1; }
+  .now .count .l { font-size: 11px; color: var(--ink-3); text-transform: uppercase; letter-spacing: .1em; }
+  .next { margin-top: 10px; color: var(--ink-3); font-size: 13px; padding: 0 4px; min-height: 20px; }
+  .next b { color: var(--ink-2); font-weight: 500; }
+
+  .controls { display: flex; gap: 10px; margin-top: 20px; justify-content: center; }
+  .btn { border: 1px solid var(--line); background: var(--card); border-radius: 999px; height: 48px; padding: 0 22px; font-weight: 500; display: inline-flex; align-items: center; gap: 8px; transition: transform .1s; }
+  .btn:active { transform: scale(.97); }
+  .btn.primary { background: var(--ink); color: var(--bg); border-color: var(--ink); min-width: 150px; justify-content: center; }
+  .btn svg { width: 16px; height: 16px; }
+  .kbd { font-size: 11px; color: var(--ink-3); text-align: center; margin-top: 10px; }
+  .kbd kbd { font-family: inherit; border: 1px solid var(--line); border-radius: 4px; padding: 0 5px; background: var(--bg-2); }
+
+  /* timeline */
+  .timeline { margin-top: 24px; }
+  .timeline ol { list-style: none; padding: 0; margin: 0; position: relative; }
+  .timeline li { display: grid; grid-template-columns: 56px 14px 1fr auto; gap: 12px; align-items: start; padding: 10px 6px; border-radius: 10px; transition: background .25s, opacity .25s; cursor: pointer; }
+  .timeline li:hover { background: var(--bg-2); }
+  .timeline li.active { background: var(--accent-soft); }
+  .timeline li.done { opacity: .5; }
+  .timeline .t { font-variant-numeric: tabular-nums; color: var(--ink-3); font-size: 13px; padding-top: 1px; }
+  .timeline .dot { width: 10px; height: 10px; border-radius: 50%; margin-top: 6px; }
+  .timeline .what { font-weight: 500; }
+  .timeline .what small { display: block; font-weight: 400; color: var(--ink-2); font-size: 13px; }
+  .timeline .g { font-family: Fraunces, serif; font-size: 18px; font-variant-numeric: tabular-nums; color: var(--ink-2); }
+
+  /* done overlay */
+  .done-banner { display: none; margin-top: 22px; padding: 22px; border-radius: 16px; background: var(--bg-2); text-align: center; }
+  .done-banner.show { display: block; animation: rise .5s ease; }
+  .done-banner h3 { font-size: 30px; margin: 0 0 4px; font-style: italic; }
+  .done-banner p { margin: 0; color: var(--ink-2); }
+  @keyframes rise { from { opacity: 0; transform: translateY(8px); } }
+
+  /* dial-in */
+  .dialin { margin-top: 24px; }
+  .taste { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip { border: 1px solid var(--line); background: transparent; border-radius: 999px; padding: 7px 14px; font-size: 13px; color: var(--ink-2); }
+  .chip[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+  .advice { margin-top: 12px; font-size: 14px; color: var(--ink-2); min-height: 44px; }
+  .advice b { color: var(--ink); font-weight: 600; }
+
+  .credit { margin-top: 40px; text-align: center; color: var(--ink-3); font-size: 12px; }
+  .credit a { color: var(--ink-2); }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <div class="eyebrow">Hario V60 · after James Hoffmann</div>
+      <h1>The <em>V60</em></h1>
+    </div>
+    <div class="header-tools">
+      <button class="icon-btn" id="soundBtn" aria-pressed="true" title="Chimes at each step">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4V5z"/><path id="soundWave" d="M15.5 8.5a5 5 0 0 1 0 7M19 5a10 10 0 0 1 0 14"/></svg>
+        <span id="soundLbl">Sound on</span>
+      </button>
+      <button class="icon-btn" id="themeBtn" title="Toggle theme">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+        <span>Theme</span>
+      </button>
+    </div>
+  </header>
+
+  <div class="grid">
+    <!-- LEFT: setup -->
+    <aside class="card pad">
+      <h2 class="section-title">Recipe</h2>
+      <div class="recipes" id="recipes" role="radiogroup" aria-label="Recipe"></div>
+
+      <div class="dose">
+        <h2 class="section-title">Dose</h2>
+        <div class="dose-row">
+          <div class="stat"><div class="v"><span id="coffeeV">30</span><small>g</small></div><div class="l">Coffee</div></div>
+          <div class="stat"><div class="v"><span id="waterV">500</span><small>g</small></div><div class="l">Water</div></div>
+          <div class="stat"><div class="v" id="ratioV">1:16.7</div><div class="l">Ratio</div></div>
+        </div>
+        <div class="slider-row">
+          <button class="step-btn" id="doseDown" aria-label="Less coffee">−</button>
+          <input type="range" id="dose" min="10" max="40" step="1" value="30" aria-label="Coffee dose in grams">
+          <button class="step-btn" id="doseUp" aria-label="More coffee">+</button>
+        </div>
+      </div>
+
+      <div class="prep">
+        <h2 class="section-title">Before you start</h2>
+        <ul id="prep"></ul>
+      </div>
+
+      <div class="dialin">
+        <h2 class="section-title">How did it taste?</h2>
+        <div class="taste" id="taste">
+          <button class="chip" data-t="sour" aria-pressed="false">Sour / thin</button>
+          <button class="chip" data-t="bitter" aria-pressed="false">Bitter / dry</button>
+          <button class="chip" data-t="slow" aria-pressed="false">Drained slow</button>
+          <button class="chip" data-t="fast" aria-pressed="false">Drained fast</button>
+          <button class="chip" data-t="good" aria-pressed="false">Delicious</button>
+        </div>
+        <div class="advice" id="advice">Tap a note after brewing for a nudge on what to change next time.</div>
+      </div>
+    </aside>
+
+    <!-- RIGHT: brew -->
+    <main class="card stage">
+      <div class="stage-top">
+        <h2 id="stageTitle">The Ultimate V60</h2>
+        <div class="sub" id="stageSub">Target finish 3:30</div>
+      </div>
+
+      <div class="stage-body">
+        <div class="dial">
+          <svg viewBox="0 0 300 300" id="dialSvg" aria-hidden="true">
+            <circle cx="150" cy="150" r="128" fill="none" stroke="var(--line)" stroke-width="10"/>
+            <g id="segs" transform="rotate(-90 150 150)"></g>
+            <circle id="dot" class="progress-dot" r="9" cx="150" cy="22"/>
+          </svg>
+          <div class="dial-center">
+            <div class="clock" id="clock" aria-live="off">0:00</div>
+            <div class="clock-sub" id="clockSub">of 3:30</div>
+            <div class="scale-read"><span class="w" id="scaleW">0</span><span class="u">g on scale</span></div>
+          </div>
+        </div>
+
+        <svg class="brewer" viewBox="0 0 200 240" aria-hidden="true">
+          <defs>
+            <clipPath id="coneClip"><path d="M38 34 L162 34 L112 104 L88 104 Z"/></clipPath>
+            <clipPath id="carafeClip"><path d="M62 132 Q58 132 58 138 L52 214 Q50 226 64 226 L136 226 Q150 226 148 214 L142 138 Q142 132 138 132 Z"/></clipPath>
+            <linearGradient id="brewGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="var(--coffee-light)"/><stop offset="1" stop-color="var(--coffee)"/>
+            </linearGradient>
+          </defs>
+          <!-- kettle stream -->
+          <line id="stream" class="stream" x1="100" y1="0" x2="100" y2="90"/>
+          <!-- cone contents -->
+          <g clip-path="url(#coneClip)">
+            <rect x="0" y="84" width="200" height="30" fill="url(#brewGrad)"/>
+            <rect id="coneWater" x="0" y="104" width="200" height="80" fill="var(--coffee-light)" opacity=".55"/>
+          </g>
+          <ellipse id="swirl" class="swirl-ring" cx="100" cy="70" rx="38" ry="8"/>
+          <!-- cone body -->
+          <path d="M30 30 L170 30 L114 108 L86 108 Z" fill="none" stroke="var(--ink)" stroke-width="2.5" stroke-linejoin="round"/>
+          <path d="M22 30 L178 30" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/>
+          <path d="M60 46 L94 100 M140 46 L106 100 M80 40 L97 96 M120 40 L103 96" stroke="var(--glass)" stroke-width="1.2"/>
+          <path d="M170 38 Q190 40 186 58 Q182 72 160 70" fill="none" stroke="var(--ink)" stroke-width="2.5" stroke-linecap="round"/>
+          <path d="M78 108 L122 108 L126 118 L74 118 Z" fill="var(--ink)"/>
+          <!-- drip -->
+          <circle id="drip" class="drip" cx="100" cy="124" r="2.6"/>
+          <!-- carafe -->
+          <g clip-path="url(#carafeClip)">
+            <rect id="carafeFill" x="0" y="226" width="200" height="120" fill="url(#brewGrad)"/>
+          </g>
+          <path d="M62 132 Q58 132 58 138 L52 214 Q50 226 64 226 L136 226 Q150 226 148 214 L142 138 Q142 132 138 132" fill="none" stroke="var(--ink)" stroke-width="2.5"/>
+          <path d="M66 150 L62 206" stroke="var(--glass)" stroke-width="3" stroke-linecap="round"/>
+          <g class="steam" id="steam">
+            <path d="M85 128 q-6 -8 0 -14 q6 -6 0 -12"/>
+            <path d="M100 128 q-6 -8 0 -14 q6 -6 0 -12"/>
+            <path d="M115 128 q-6 -8 0 -14 q6 -6 0 -12"/>
+          </g>
+        </svg>
+      </div>
+
+      <div class="now" id="now">
+        <div>
+          <div class="tag" id="nowTag"><i></i><span>Ready</span></div>
+          <h3 id="nowTitle">Prep, then press start</h3>
+          <p id="nowText">Work through the checklist, put your brewer on the scale and tare it.</p>
+        </div>
+        <div class="count">
+          <div class="n" id="nowCount">—</div>
+          <div class="l" id="nowCountLbl">&nbsp;</div>
+        </div>
+      </div>
+      <div class="next" id="next"></div>
+
+      <div class="done-banner" id="done">
+        <h3>Enjoy your cup.</h3>
+        <p id="doneText">Brewed in 3:30.</p>
+      </div>
+
+      <div class="controls">
+        <button class="btn" id="resetBtn" title="Reset (R)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>Reset
+        </button>
+        <button class="btn primary" id="startBtn">
+          <svg id="startIcon" viewBox="0 0 24 24" fill="currentColor"><path d="M7 4v16l13-8z"/></svg><span id="startLbl">Start brew</span>
+        </button>
+      </div>
+      <div class="kbd"><kbd>Space</kbd> start / pause · <kbd>R</kbd> reset · tap a step to jump to it</div>
+
+      <div class="timeline">
+        <h2 class="section-title">Steps</h2>
+        <ol id="timeline"></ol>
+      </div>
+    </main>
+  </div>
+
+  <p class="credit">Recipes adapted from James Hoffmann’s
+    <a href="https://www.youtube.com/watch?v=AI4ynXzkSQo" target="_blank" rel="noopener">Ultimate V60 Technique</a> and
+    <a href="https://www.youtube.com/watch?v=1oB1oDrDkHM" target="_blank" rel="noopener">A Better 1-Cup V60</a>.</p>
+</div>
+
+<script>
+(() => {
+  // ---------- Recipes ----------
+  // Each step: start/end seconds, kind, cumulative target (fraction of total water), title, text.
+  const RECIPES = [
+    {
+      id: 'ultimate',
+      name: 'The Ultimate V60',
+      blurb: 'Hoffmann’s classic two-pour technique. Big, sweet, clear.',
+      ratio: 60 / 1000, defaultDose: 30, min: 12, max: 40,
+      grind: 'medium-fine', temp: 'Just off the boil — as hot as you can for light roasts',
+      steps: (C, W) => {
+        const bloom = Math.round(C * 2);
+        return [
+          { s: 0,   e: 10,  kind: 'pour',  to: bloom, title: 'Bloom', text: `Pour ${bloom}g (2× the coffee) evenly over the bed.` },
+          { s: 10,  e: 15,  kind: 'swirl', title: 'Swirl', text: 'Pick up the brewer and swirl until all the grounds are wet.' },
+          { s: 15,  e: 45,  kind: 'wait',  title: 'Let it bloom', text: 'Let the CO₂ escape. Up to 45 seconds total.' },
+          { s: 45,  e: 75,  kind: 'pour',  to: Math.round(W * 0.6), title: 'Main pour', text: `Pour steadily to ${Math.round(W * 0.6)}g — about 60% of the water — within 30s.` },
+          { s: 75,  e: 105, kind: 'pour',  to: W, title: 'Second pour', text: `Slower now. Pour to ${W}g over the next 30 seconds.` },
+          { s: 105, e: 112, kind: 'stir',  title: 'Stir', text: 'With a spoon, stir gently once clockwise, once counter-clockwise.' },
+          { s: 112, e: 118, kind: 'swirl', title: 'Swirl', text: 'A gentle swirl to flatten the bed for an even drawdown.' },
+          { s: 118, e: 210, kind: 'wait',  title: 'Drawdown', text: 'Let it drain. Aim to finish around 3:30.' },
+        ];
+      },
+    },
+    {
+      id: 'onecup',
+      name: 'A Better 1-Cup V60',
+      blurb: 'Five small pulses for a single cup. Keeps the bed hot and agitated.',
+      ratio: 60 / 1000, defaultDose: 15, min: 10, max: 20,
+      grind: 'medium-fine — a touch finer than for a big brew', temp: 'Boiling, or as close as your kettle gets',
+      steps: (C, W) => {
+        const p = n => Math.round(W * n / 5);
+        return [
+          { s: 0,   e: 10,  kind: 'pour',  to: p(1), title: 'Bloom', text: `Pour ${p(1)}g to bloom.` },
+          { s: 10,  e: 15,  kind: 'swirl', title: 'Swirl', text: 'Gently swirl so every ground is wet.' },
+          { s: 15,  e: 45,  kind: 'wait',  title: 'Let it bloom', text: 'Rest until 0:45.' },
+          { s: 45,  e: 55,  kind: 'pour',  to: p(2), title: 'Pour 2', text: `Pour to ${p(2)}g.` },
+          { s: 55,  e: 70,  kind: 'wait',  title: 'Pause', text: 'Let it settle.' },
+          { s: 70,  e: 80,  kind: 'pour',  to: p(3), title: 'Pour 3', text: `Pour to ${p(3)}g.` },
+          { s: 80,  e: 90,  kind: 'wait',  title: 'Pause', text: 'Let it settle.' },
+          { s: 90,  e: 100, kind: 'pour',  to: p(4), title: 'Pour 4', text: `Pour to ${p(4)}g.` },
+          { s: 100, e: 110, kind: 'wait',  title: 'Pause', text: 'Let it settle.' },
+          { s: 110, e: 120, kind: 'pour',  to: W, title: 'Final pour', text: `Pour to ${W}g.` },
+          { s: 120, e: 128, kind: 'swirl', title: 'Swirl', text: 'One gentle swirl to flatten the bed.' },
+          { s: 128, e: 180, kind: 'wait',  title: 'Drawdown', text: 'Let it drain. Aim to finish around 3:00.' },
+        ];
+      },
+    },
+  ];
+
+  const KIND = {
+    pour:  { label: 'Pour',  color: 'var(--accent)' },
+    swirl: { label: 'Swirl', color: 'var(--swirl)' },
+    stir:  { label: 'Stir',  color: 'var(--swirl)' },
+    wait:  { label: 'Wait',  color: 'var(--wait)' },
+  };
+
+  // ---------- State ----------
+  const $ = id => document.getElementById(id);
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem('pourover:' + k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem('pourover:' + k, JSON.stringify(v)); } catch {} },
+  };
+
+  let recipe = RECIPES.find(r => r.id === store.get('recipe', 'ultimate')) || RECIPES[0];
+  let dose = store.get('dose:' + recipe.id, recipe.defaultDose);
+  let steps = [], water = 0, total = 0;
+  let running = false, startTs = 0, base = 0, elapsed = 0, raf = 0;
+  let lastIdx = -1, lastBeep = -1, finished = false;
+  let soundOn = store.get('sound', true);
+  let wakeLock = null;
+
+  const fmt = s => { s = Math.max(0, Math.floor(s)); return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`; };
+
+  // ---------- Audio ----------
+  let ctx;
+  function tone(freq, dur = 0.5, gain = 0.12, when = 0) {
+    if (!soundOn) return;
+    try {
+      ctx = ctx || new (window.AudioContext || window.webkitAudioContext)();
+      const t = ctx.currentTime + when;
+      const o = ctx.createOscillator(), g = ctx.createGain();
+      o.type = 'sine'; o.frequency.value = freq;
+      g.gain.setValueAtTime(0, t);
+      g.gain.linearRampToValueAtTime(gain, t + 0.01);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+      o.connect(g).connect(ctx.destination); o.start(t); o.stop(t + dur + 0.05);
+    } catch {}
+  }
+  const chime = () => { tone(784, 0.9, 0.12); tone(1175, 1.1, 0.07, 0.08); };
+  const tick = () => tone(523, 0.15, 0.06);
+  const finale = () => { tone(659, 1, .1); tone(784, 1, .1, .15); tone(1047, 1.4, .1, .3); };
+
+  // ---------- Build UI ----------
+  function renderRecipes() {
+    const el = $('recipes'); el.innerHTML = '';
+    for (const r of RECIPES) {
+      const b = document.createElement('button');
+      b.className = 'recipe'; b.setAttribute('role', 'radio');
+      b.setAttribute('aria-checked', r === recipe);
+      const end = r.steps(r.defaultDose, Math.round(r.defaultDose / r.ratio)).at(-1).e;
+      b.innerHTML = `<div class="name">${r.name}<span class="time">${fmt(end)}</span></div><div class="meta">${r.blurb}</div>`;
+      b.onclick = () => selectRecipe(r);
+      el.appendChild(b);
+    }
+  }
+
+  function selectRecipe(r) {
+    if (r === recipe) return;
+    recipe = r; store.set('recipe', r.id);
+    dose = store.get('dose:' + r.id, r.defaultDose);
+    reset(); renderRecipes(); compute();
+  }
+
+  function compute() {
+    const input = $('dose');
+    input.min = recipe.min; input.max = recipe.max; input.value = dose;
+    water = Math.round(dose / recipe.ratio);
+    steps = recipe.steps(dose, water);
+    let last = 0;
+    for (const st of steps) { st.from = last; if (st.kind === 'pour') last = st.to; st.at = last; }
+    total = steps.at(-1).e;
+
+    $('coffeeV').textContent = dose;
+    $('waterV').textContent = water;
+    $('ratioV').textContent = '1:' + (1 / recipe.ratio).toFixed(1);
+    $('stageTitle').textContent = recipe.name;
+    $('stageSub').textContent = `${dose}g coffee · ${water}g water · finish ~${fmt(total)}`;
+    $('clockSub').textContent = 'of ' + fmt(total);
+    $('doneText').textContent = `${dose}g into ${water}g, brewed in ${fmt(total)}.`;
+    renderPrep(); renderSegments(); renderTimeline(); update();
+  }
+
+  function renderPrep() {
+    const items = [
+      [`Heat <b>${Math.round(water * 1.6 / 50) * 50}g+</b> of water`, recipe.temp],
+      [`Grind <b>${dose}g</b> of coffee`, recipe.grind],
+      ['Fold the filter seam & seat it', 'Crease along the seam so the paper sits flush against the V60’s ribs'],
+      ['Rinse the paper filter', 'Hot water through the paper to preheat the cone, then dump it from the carafe'],
+      ['Add coffee & dig a small well', 'A little divot in the centre helps the bloom wet evenly'],
+      ['Place on scale and tare', 'Everything on the scale, reading zero'],
+    ];
+    const saved = store.get('prep', []);
+    $('prep').innerHTML = items.map(([a, b], i) => `
+      <li><label><input type="checkbox" data-i="${i}" ${saved.includes(i) ? 'checked' : ''}>
+        <span class="check"><svg viewBox="0 0 12 12" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 6.5 5 9l4.5-6"/></svg></span>
+        <span class="txt">${a}<small>${b}</small></span></label></li>`).join('');
+  }
+  $('prep').addEventListener('change', () => {
+    store.set('prep', [...document.querySelectorAll('#prep input:checked')].map(i => +i.dataset.i));
+  });
+
+  const R = 128, CIRC = 2 * Math.PI * R;
+  function renderSegments() {
+    const g = $('segs'); g.innerHTML = '';
+    const gap = 2.5;
+    for (const st of steps) {
+      const len = (st.e - st.s) / total * CIRC;
+      const c = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      c.setAttribute('cx', 150); c.setAttribute('cy', 150); c.setAttribute('r', R);
+      c.setAttribute('class', 'seg');
+      c.style.stroke = KIND[st.kind].color;
+      c.setAttribute('stroke-dasharray', `${Math.max(0.5, len - gap)} ${CIRC}`);
+      c.setAttribute('stroke-dashoffset', -(st.s / total * CIRC));
+      g.appendChild(c); st.seg = c;
+    }
+  }
+
+  function renderTimeline() {
+    const ol = $('timeline'); ol.innerHTML = '';
+    steps.forEach((st, i) => {
+      const li = document.createElement('li');
+      li.innerHTML = `<span class="t">${fmt(st.s)}</span><span class="dot" style="background:${KIND[st.kind].color}"></span>
+        <span class="what">${st.title}<small>${st.text}</small></span>
+        <span class="g">${st.kind === 'pour' ? st.to + 'g' : ''}</span>`;
+      li.onclick = () => seek(st.s);
+      ol.appendChild(li); st.li = li;
+    });
+  }
+
+  // ---------- Timer ----------
+  function now() { return running ? base + (performance.now() - startTs) / 1000 : base; }
+
+  function start() {
+    if (finished) reset();
+    running = true; startTs = performance.now();
+    if (ctx && ctx.state === 'suspended') ctx.resume();
+    if (base === 0) chime();
+    requestWake();
+    loop();
+    setStartBtn();
+  }
+  function pause() {
+    base = now(); running = false; cancelAnimationFrame(raf);
+    releaseWake(); setStartBtn(); update();
+  }
+  function reset() {
+    running = false; cancelAnimationFrame(raf);
+    base = 0; lastIdx = -1; lastBeep = -1; finished = false;
+    releaseWake(); setStartBtn(); update();
+  }
+  function seek(t) {
+    base = t; startTs = performance.now(); finished = false; lastBeep = Math.floor(t);
+    lastIdx = steps.findIndex(s => t >= s.s && t < s.e);
+    update();
+  }
+  function loop() { update(); if (running) raf = requestAnimationFrame(loop); }
+
+  function setStartBtn() {
+    $('startLbl').textContent = running ? 'Pause' : (base > 0 && !finished ? 'Resume' : 'Start brew');
+    $('startIcon').innerHTML = running ? '<path d="M6 4h4v16H6zM14 4h4v16h-4z"/>' : '<path d="M7 4v16l13-8z"/>';
+  }
+
+  function scaleAt(t) {
+    for (const st of steps) {
+      if (t < st.s) return st.from;
+      if (t < st.e) return st.kind === 'pour' ? st.from + (st.to - st.from) * ((t - st.s) / (st.e - st.s)) : st.at;
+    }
+    return water;
+  }
+
+  function update() {
+    const t = Math.min(now(), total);
+    elapsed = t;
+    const idx = steps.findIndex(s => t >= s.s && t < s.e);
+    const started = base > 0 || running;
+
+    // completion
+    if (t >= total && started && !finished) {
+      finished = true; running = false; base = total; cancelAnimationFrame(raf);
+      finale(); releaseWake(); setStartBtn(); buzz([200, 100, 200]);
+    }
+
+    // step transitions + countdown ticks
+    if (running && idx !== lastIdx && idx >= 0) {
+      if (lastIdx !== -1 || t > 0.5) { chime(); buzz(120); }
+      lastIdx = idx;
+    }
+    if (running) {
+      const nextStep = steps[idx + 1];
+      if (nextStep) {
+        const remain = nextStep.s - t, sec = Math.ceil(remain);
+        if (sec <= 3 && sec >= 1 && sec !== lastBeep && nextStep.kind !== 'wait') { lastBeep = sec; tick(); }
+      }
+    }
+
+    // clock + dial
+    $('clock').textContent = fmt(t);
+    const frac = total ? t / total : 0;
+    const ang = frac * 2 * Math.PI - Math.PI / 2;
+    $('dot').setAttribute('cx', 150 + R * Math.cos(ang));
+    $('dot').setAttribute('cy', 150 + R * Math.sin(ang));
+    steps.forEach((st, i) => {
+      st.seg.classList.toggle('past', started && t >= st.e);
+      st.li.classList.toggle('active', started && i === idx && !finished);
+      st.li.classList.toggle('done', started && t >= st.e);
+    });
+
+    const w = started ? scaleAt(t) : 0;
+    $('scaleW').textContent = Math.round(w);
+
+    // now panel
+    const cur = steps[idx];
+    const nowEl = $('now');
+    if (!started) {
+      setNow('Ready', 'var(--ink-3)', 'Prep, then press start', 'Work through the checklist, put your brewer on the scale and tare it.', '—', '');
+      nowEl.style.setProperty('--p', '0%');
+      const first = steps[0];
+      $('next').innerHTML = `First up: <b>${first.title}</b> — ${first.text}`;
+    } else if (finished) {
+      setNow('Done', 'var(--accent)', 'Drawdown complete', 'Remove the brewer, give the carafe a swirl, and pour.', fmt(total), 'total');
+      nowEl.style.setProperty('--p', '100%');
+      $('next').innerHTML = '';
+    } else if (cur) {
+      const k = KIND[cur.kind];
+      const remain = cur.e - t;
+      const title = cur.kind === 'pour' ? `${cur.title} → ${cur.to}g` : cur.title;
+      setNow(k.label, k.color === 'var(--wait)' ? 'var(--ink-2)' : k.color, title, cur.text, Math.ceil(remain) + 's', 'left');
+      nowEl.style.setProperty('--p', ((t - cur.s) / (cur.e - cur.s) * 100).toFixed(1) + '%');
+      const nx = steps[idx + 1];
+      $('next').innerHTML = nx ? `Next in ${fmt(nx.s - t + 0.999)}: <b>${nx.title}${nx.kind === 'pour' ? ' to ' + nx.to + 'g' : ''}</b>` : `Finish around <b>${fmt(total)}</b>`;
+    }
+    $('done').classList.toggle('show', finished);
+
+    // illustration
+    const pouring = running && cur && cur.kind === 'pour';
+    const swirling = running && cur && (cur.kind === 'swirl' || cur.kind === 'stir');
+    const lag = recipe.id === 'onecup' ? 25 : 35;
+    const inCarafe = started ? (t >= total ? water : Math.min(scaleAt(Math.max(0, t - lag)) * 0.92, water)) : 0;
+    const inCone = Math.max(0, w - inCarafe);
+    const coneFrac = Math.min(1, inCone / (water * 0.65));
+    const coneY = 104 - coneFrac * 66;
+    $('coneWater').setAttribute('y', coneY);
+    $('stream').setAttribute('y2', Math.min(coneY, 100));
+    $('stream').classList.toggle('on', !!pouring);
+    $('swirl').classList.toggle('on', !!swirling);
+    const carFrac = started ? inCarafe / water : 0;
+    const carY = 226 - carFrac * 82;
+    $('carafeFill').setAttribute('y', carY);
+    const dripping = running && inCone > water * 0.02;
+    $('drip').classList.toggle('on', dripping);
+    $('drip').style.setProperty('--drop', Math.max(10, carY - 126) + 'px');
+    $('steam').classList.toggle('on', finished || (started && carFrac > 0.25));
+  }
+
+  function setNow(tag, color, title, text, count, countLbl) {
+    $('nowTag').style.color = color;
+    $('nowTag').querySelector('span').textContent = tag;
+    $('nowTitle').textContent = title;
+    $('nowText').textContent = text;
+    $('nowCount').textContent = count;
+    $('nowCountLbl').textContent = countLbl || ' ';
+  }
+
+  function buzz(p) { try { navigator.vibrate && navigator.vibrate(p); } catch {} }
+  async function requestWake() { try { wakeLock = await navigator.wakeLock?.request('screen'); } catch {} }
+  function releaseWake() { try { wakeLock?.release(); } catch {} wakeLock = null; }
+  document.addEventListener('visibilitychange', () => { if (running && document.visibilityState === 'visible') requestWake(); });
+
+  // ---------- Controls ----------
+  $('startBtn').onclick = () => running ? pause() : start();
+  $('resetBtn').onclick = reset;
+  function setDose(v) {
+    dose = Math.max(recipe.min, Math.min(recipe.max, v));
+    store.set('dose:' + recipe.id, dose);
+    reset(); compute();
+  }
+  $('dose').oninput = e => setDose(+e.target.value);
+  $('doseDown').onclick = () => setDose(dose - 1);
+  $('doseUp').onclick = () => setDose(dose + 1);
+
+  document.addEventListener('keydown', e => {
+    if (e.target.matches('input, textarea')) return;
+    if (e.code === 'Space') { e.preventDefault(); running ? pause() : start(); }
+    else if (e.key === 'r' || e.key === 'R') reset();
+  });
+
+  function setSound(on) {
+    soundOn = on; store.set('sound', on);
+    $('soundBtn').setAttribute('aria-pressed', on);
+    $('soundLbl').textContent = on ? 'Sound on' : 'Sound off';
+    $('soundWave').style.display = on ? '' : 'none';
+  }
+  $('soundBtn').onclick = () => { setSound(!soundOn); if (soundOn) tick(); };
+
+  const savedTheme = store.get('theme', null);
+  if (savedTheme) document.documentElement.dataset.theme = savedTheme;
+  $('themeBtn').onclick = () => {
+    const cur = document.documentElement.dataset.theme ||
+      (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    const next = cur === 'dark' ? 'light' : 'dark';
+    document.documentElement.dataset.theme = next; store.set('theme', next);
+  };
+
+  // ---------- Dial-in advice (Hoffmann's rules of thumb) ----------
+  const ADVICE = {
+    sour: '<b>Under-extracted.</b> Grind finer next time. If you’re already fine, use hotter water or extend the bloom toward the full 45s.',
+    bitter: '<b>Over-extracted.</b> Grind a little coarser. Bitter and dry together often means the grind has too many fines, or the drawdown stalled.',
+    slow: '<b>Drawdown ran long.</b> Go coarser, or be gentler with the stir and swirl. Clogging can also mean too many fines from your grinder.',
+    fast: '<b>Drawdown ran short.</b> Go finer. Check the paper is seated against the cone and the water lands on the coffee, not the paper.',
+    good: '<b>Nailed it.</b> Note your grind setting and keep it. Change one variable at a time from here.',
+  };
+  $('taste').addEventListener('click', e => {
+    const b = e.target.closest('.chip'); if (!b) return;
+    const on = b.getAttribute('aria-pressed') !== 'true';
+    document.querySelectorAll('#taste .chip').forEach(c => c.setAttribute('aria-pressed', 'false'));
+    b.setAttribute('aria-pressed', on);
+    $('advice').innerHTML = on ? ADVICE[b.dataset.t] : 'Tap a note after brewing for a nudge on what to change next time.';
+  });
+
+  setSound(soundOn);
+  renderRecipes();
+  compute();
+})();
+</script>
+</body>
+</html>
